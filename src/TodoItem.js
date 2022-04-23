@@ -1,9 +1,9 @@
 import React, { useState, useContext } from 'react';
-import { Context } from './context';
+import { AppContext } from './App.context';
 
 export const TodoItem = ({ id, title, completed }) => {
   // const [checked, setChecked] = useState(completed);
-  const { toggleTodo, removeTodo } = useContext(Context);
+  const { toggleTodo, removeTodo } = useContext(AppContext);
 
   const cls = ['todo']
 

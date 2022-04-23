@@ -1,6 +1,6 @@
 import React, { useEffect, useId, useState } from 'react'
 import { TodoList } from './TodoList';
-import { Context } from './context';
+import { AppContext } from './App.context';
 
 const App = () => {
   const initialState = {
@@ -19,8 +19,6 @@ const App = () => {
       console.log('ComponentDidMount deps todos');
     };
   }, []);
-
-  const handleClick = () => console.log('click');
 
   useEffect(() => {
     console.log('ComponentDidUpdate deps todos');
@@ -59,7 +57,7 @@ const App = () => {
   };
 
   return (
-    <Context.Provider value={{
+    <AppContext.Provider value={{
       removeTodo,
       toggleTodo,
     }}>
@@ -78,7 +76,7 @@ const App = () => {
 
         <TodoList todos={state.todos} />
       </div>
-    </Context.Provider>
+    </AppContext.Provider>
   );
 };
 
