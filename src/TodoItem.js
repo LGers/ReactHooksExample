@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 
 export const TodoItem = ({ id, title, completed }) => {
   const [checked, setChecked] = useState(completed);
@@ -14,7 +14,7 @@ export const TodoItem = ({ id, title, completed }) => {
         <input
           type={"checkbox"}
           checked={checked}
-          onClick={() => setChecked(!checked)}
+          onChange={() => setChecked(!checked)}
         />
         <span>{title}</span>
 
@@ -26,4 +26,4 @@ export const TodoItem = ({ id, title, completed }) => {
       </label>
     </li>
   );
-  ;}
+};

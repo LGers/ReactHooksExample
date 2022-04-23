@@ -1,27 +1,46 @@
-import React, {useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import { TodoList } from './TodoList';
 
 const App = () => {
   const initialState = {
-    todos: [
-      { id: 0, title: 'First1 Todo', completed: true },
-      { id: 1, title: 'Second Todo', completed: false },
-    ],
+    todos: [],
     title: '',
   };
 
   const [state, setState] = useState(initialState);
-  const onChange = (event) =>{
-    setState((prev) => ({ ...prev, title: event.target.value }))
+
+  useEffect(() => {
+    console.log('ComponentDidMount');
+    const raw = localStorage.getItem('todos') || [];
+    const todos = JSON.parse(raw);
+    setState((prev) => ({ ...prev, todos }));
+    return () => {
+      console.log('ComponentDidMount deps todos');
+    };
+  }, []);
+
+  const handleClick = () => console.log('click');
+
+  useEffect(() => {
+    console.log('ComponentDidUpdate deps todos');
+    document.addEventListener('click', handleClick);
+    localStorage.setItem('todos', JSON.stringify(state.todos));
+    return () => {
+      document.removeEventListener('click', handleClick)
+    };
+  }, [state.todos]);
+
+  const onChange = (event) => {
+    setState((prev) => ({ ...prev, title: event.target.value }));
   };
 
-  const addTodo = (event) =>{
+  const addTodo = (event) => {
     if (event.key === 'Enter') {
       const newTodo = { id: state.todos.length, title: state.title, completed: false };
       setState((prev) => (
-        { ...prev, todos: [ ...state.todos, newTodo], title: '' }
+          { ...prev, todos: [...state.todos, newTodo], title: '' }
         )
-      )
+      );
     }
   };
 
@@ -36,13 +55,12 @@ const App = () => {
           value={state.title}
           onChange={onChange}
           onKeyPress={addTodo}
-          // placeholder={'Todo name'}
         />
       </div>
 
       <TodoList todos={state.todos} />
     </div>
   );
-}
+};
 
 export default App;
