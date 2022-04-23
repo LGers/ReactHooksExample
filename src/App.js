@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useId, useState } from 'react'
 import { TodoList } from './TodoList';
+import { Context } from './context';
 
 const App = () => {
   const initialState = {
@@ -23,11 +24,7 @@ const App = () => {
 
   useEffect(() => {
     console.log('ComponentDidUpdate deps todos');
-    document.addEventListener('click', handleClick);
     localStorage.setItem('todos', JSON.stringify(state.todos));
-    return () => {
-      document.removeEventListener('click', handleClick)
-    };
   }, [state.todos]);
 
   const onChange = (event) => {
@@ -36,7 +33,7 @@ const App = () => {
 
   const addTodo = (event) => {
     if (event.key === 'Enter') {
-      const newTodo = { id: state.todos.length, title: state.title, completed: false };
+      const newTodo = { id: new Date(), title: state.title, completed: false };
       setState((prev) => (
           { ...prev, todos: [...state.todos, newTodo], title: '' }
         )
@@ -44,22 +41,44 @@ const App = () => {
     }
   };
 
+  const removeTodo = (id) => {
+    setState((prev) => (
+        { ...prev, todos: state.todos.filter((todo) => (todo.id !== id)) }
+      )
+    );
+  };
+
+  const toggleTodo = (id) => {
+    setState((prev) => (
+      { ...prev, todos: state.todos.map((todo) => {
+        if (todo.id === id) {todo.completed = !todo.completed}
+        return todo;
+        }) }
+      )
+    );
+  };
+
   return (
-    <div className="container">
-      <h1>Todo App</h1>
+    <Context.Provider value={{
+      removeTodo,
+      toggleTodo,
+    }}>
+      <div className="container">
+        <h1>Todo App</h1>
 
-      <label>Todo name</label>
-      <div className={"input-field"}>
-        <input
-          type="text"
-          value={state.title}
-          onChange={onChange}
-          onKeyPress={addTodo}
-        />
+        <label>Todo name</label>
+        <div className={"input-field"}>
+          <input
+            type="text"
+            value={state.title}
+            onChange={onChange}
+            onKeyPress={addTodo}
+          />
+        </div>
+
+        <TodoList todos={state.todos} />
       </div>
-
-      <TodoList todos={state.todos} />
-    </div>
+    </Context.Provider>
   );
 };
 
