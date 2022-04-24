@@ -1,26 +1,14 @@
-import React, { useEffect, useId, useState } from 'react'
+import React, { useEffect, useReducer } from 'react'
 import { TodoList } from './TodoList';
-import { Context } from './context';
+import { AppContext } from './App.context';
+import { appReducer } from './App.reducer';
 
 const App = () => {
   const initialState = {
-    todos: [],
+    todos: JSON.parse(localStorage.getItem('todos')),
     title: '',
   };
-
-  const [state, setState] = useState(initialState);
-
-  useEffect(() => {
-    console.log('ComponentDidMount');
-    const raw = localStorage.getItem('todos') || [];
-    const todos = JSON.parse(raw);
-    setState((prev) => ({ ...prev, todos }));
-    return () => {
-      console.log('ComponentDidMount deps todos');
-    };
-  }, []);
-
-  const handleClick = () => console.log('click');
+  const [state, dispatch] = useReducer(appReducer, initialState);
 
   useEffect(() => {
     console.log('ComponentDidUpdate deps todos');
@@ -28,38 +16,25 @@ const App = () => {
   }, [state.todos]);
 
   const onChange = (event) => {
-    setState((prev) => ({ ...prev, title: event.target.value }));
+    dispatch({ type: 'changeInput', payload: event.target.value});
   };
 
   const addTodo = (event) => {
     if (event.key === 'Enter') {
-      const newTodo = { id: new Date(), title: state.title, completed: false };
-      setState((prev) => (
-          { ...prev, todos: [...state.todos, newTodo], title: '' }
-        )
-      );
+      dispatch({ type: 'add', payload: state.title});
     }
   };
 
   const removeTodo = (id) => {
-    setState((prev) => (
-        { ...prev, todos: state.todos.filter((todo) => (todo.id !== id)) }
-      )
-    );
+    dispatch({ type: 'remove', payload: id});
   };
 
   const toggleTodo = (id) => {
-    setState((prev) => (
-      { ...prev, todos: state.todos.map((todo) => {
-        if (todo.id === id) {todo.completed = !todo.completed}
-        return todo;
-        }) }
-      )
-    );
+    dispatch({ type: 'toggle', payload: id});;
   };
 
   return (
-    <Context.Provider value={{
+    <AppContext.Provider value={{
       removeTodo,
       toggleTodo,
     }}>
@@ -78,7 +53,7 @@ const App = () => {
 
         <TodoList todos={state.todos} />
       </div>
-    </Context.Provider>
+    </AppContext.Provider>
   );
 };
 
